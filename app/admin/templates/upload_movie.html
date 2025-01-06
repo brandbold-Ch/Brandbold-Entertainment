@@ -1,0 +1,124 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Upload Movie{% endblock %}
+
+{% block content %}
+<style>
+    /* Subir Nueva Película */
+    .form-container {
+        background-color: #444444; /* Fondo más claro */
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-container h3 {
+        color: #ffffff;
+        margin-bottom: 30px;
+        font-size: 26px;
+        text-align: center;
+    }
+
+    .form-container label {
+        color: #cccccc;
+        font-size: 18px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .form-container input,
+    .form-container select,
+    .form-container textarea {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+
+    .form-container input:focus,
+    .form-container select:focus,
+    .form-container textarea:focus {
+        border-color: #e74c3c;  /* Rojo */
+    }
+
+    .form-container button {
+        background-color: #e74c3c;
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        width: 100%;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+
+    .form-container button:hover {
+        background-color: #c0392b;  /* Rojo más oscuro */
+    }
+
+    /* Responsive styles */
+    @media (max-width: 600px) {
+        .sidebar {
+            width: 200px;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 10px;
+        }
+
+        .section-card {
+            padding: 15px;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-container button {
+            font-size: 16px;
+        }
+    }
+</style>
+<div class="section-card">
+    <div class="form-container">
+        <h3>Subir Nueva Película</h3>
+        <form action="/admin/upload_movie" method="POST" enctype="multipart/form-data">
+            <div>
+                <label for="title">Título:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div>
+                <label for="genre">Género:</label>
+                <input type="text" id="genre" name="genre" required>
+            </div>
+            <div>
+                <label for="release_year">Año:</label>
+                <input type="number" id="release_year" name="release_year" required>
+            </div>
+            <div>
+                <label for="description">Descripción:</label>
+                <textarea id="description" name="description" rows="4" required></textarea>
+            </div>
+            <div>
+                <label for="duration">Duración:</label>
+                <input id="duration" name="duration" required>
+            </div>
+            <div>
+                <label for="thumbnail_url">Carátula:</label>
+                <input type="file" id="thumbnail_url" name="thumbnail_url" accept=".webp" required>
+            </div>
+            <div>
+                <label for="video_url">Archivo de Película:</label>
+                <input type="file" id="video_url" name="video_url" required>
+            </div>
+            <button type="submit">Subir Película</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

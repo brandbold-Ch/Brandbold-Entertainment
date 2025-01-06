@@ -1,0 +1,70 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Video Streaming{% endblock %}
+
+{% block content %}
+<style>
+    /* Video player styling */
+    .video-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #444;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        margin-top: 20px;
+        max-width: 800px;
+        width: 100%;
+    }
+
+    .video-container video {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .video-controls {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding-top: 10px;
+    }
+
+    .video-controls button {
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .video-controls button:hover {
+        background-color: #c0392b;
+    }
+</style>
+
+<!-- Video Player Modal -->
+<div id="videoPlayerModal" class="video-container" style="display: block;"> <!-- Se muestra automáticamente -->
+    <video id="videoPlayer" controls autoplay> <!-- Se agrega el atributo autoplay -->
+        <source id="videoSource" src="{{ url_for('static', filename='movies/' ~ file) }}" type="video/mp4">
+        Tu navegador no soporta la etiqueta de video.
+    </video>
+    <div class="video-controls">
+        <button onclick="closeVideo()">Cerrar</button>
+    </div>
+</div>
+
+<script>
+    // Función para cerrar el reproductor de video
+    function closeVideo() {
+        const videoModal = document.getElementById('videoPlayerModal');
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        videoPlayer.pause(); // Pausa el video
+        videoModal.style.display = 'none'; // Cierra el modal
+    }
+</script>
+{% endblock %}

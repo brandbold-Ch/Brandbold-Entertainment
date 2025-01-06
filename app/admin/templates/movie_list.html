@@ -1,0 +1,136 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Upload Movie{% endblock %}
+
+{% block content %}
+<style xmlns="http://www.w3.org/1999/html">
+    /* Table styling */
+    .table-container {
+        background-color: #333333;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #444;
+    }
+
+    th {
+        background-color: #444;
+        color: #ffffff;
+    }
+
+    td {
+        color: #cccccc;
+    }
+
+    tr:hover {
+        background-color: #555;
+    }
+
+    .btn-action {
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-action:hover {
+        background-color: #c0392b;  /* Rojo más oscuro */
+    }
+
+    .btn-action.delete {
+        background-color: #c0392b;  /* Rojo oscuro */
+    }
+
+    .btn-action.delete:hover {
+        background-color: #e74c3c;
+    }
+
+    /* Remove underline and blue color from <a> inside .btn-action */
+    .btn-action a {
+        text-decoration: none; /* Remove underline */
+        color: inherit; /* Inherit color from the button */
+    }
+
+    /* Image next to title */
+    .movie-title {
+        display: flex;
+        align-items: center;
+    }
+
+    .movie-title img {
+        max-width: 40px; /* Ajusta el tamaño de la imagen */
+        margin-right: 10px;
+        border-radius: 5px;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 600px) {
+        .sidebar {
+            width: 200px;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 10px;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .btn-action {
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+    }
+</style>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Año</th>
+                <th>Género</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movie in movies %}
+            <tr>
+                <td class="movie-title">
+                    <img src="{{ url_for('static', filename='thumbnail/' ~ movie.thumbnail_url) }}" alt="Imagen de película"> <!-- Reemplaza por una imagen real -->
+                    {{ movie.title }}
+                </td>
+                <td>{{ movie.release_year }}</td>
+                <td>{{ movie.genre }}</td>
+                <td>
+                    <button class="btn-action"><a href="{{ url_for('admin.video_streaming', movie_path=movie.video_url) }}">Ver</a></button>
+                    <button class="btn-action delete">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+            <!-- More movies can be added here -->
+        </tbody>
+    </table>
+</div>
+{% endblock %}
