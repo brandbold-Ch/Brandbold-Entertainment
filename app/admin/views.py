@@ -14,12 +14,31 @@ RESOURCES_DIR = "../../../static"
 THUMBNAIL_DIR = "thumbnail"
 MOVIES_DIR = "movies"
 THUMBNAIL_EXT = "webp"
-MOVIE_EXT = "mkv"
 
 
 def res_path(file: str, _type: str, _dir: str) -> str:
     filename = f"{RESOURCES_DIR}/{_dir}/{file}.{_type}"
     return path.abspath(path.join(__file__, filename))
+
+
+def select_format(content: str) -> str:
+    match content:
+        case "video/mp4":
+            return "mp4"
+        case "video/x-matroska":
+            return "mkv"
+        case "video/webm":
+            return "webm"
+        case "video/ogg":
+            return "ogg"
+        case "video/avi":
+            return "avi"
+
+
+def save_file(file: FileStorage, filename: str, extension: str, directory: str):
+    file_path = res_path(filename, extension, directory)
+    with open(file_path, "wb") as f:
+        f.write(file.read())
 
 
 @admin_bl.route("/", methods=["GET"])
@@ -36,21 +55,18 @@ def movie_list():
 @admin_bl.route("/upload_movie", methods=["GET", "POST"])
 def upload_movie():
     if request.method == "POST":
-        movie_file: FileStorage = request.files["video_url"]
-        thumb_file: FileStorage = request.files["thumbnail_url"]
-        filename = str(uuid4())
+        movie_file: FileStorage = request.files.get("video_url")
+        thumb_file: FileStorage = request.files.get("thumbnail_url")
+        generic_name = str(uuid4())
 
-        thumbnail_path = res_path(filename, THUMBNAIL_EXT, THUMBNAIL_DIR)
-        with open(thumbnail_path, "wb") as thumb:
-            thumb.write(thumb_file.read())
-
-        movie_path = res_path(filename, MOVIE_EXT, MOVIES_DIR)
-        with open(movie_path, "wb") as movie:
-            movie.write(movie_file.read())
+        video_format = select_format(movie_file.content_type)
+        save_file(thumb_file, generic_name, THUMBNAIL_EXT, THUMBNAIL_DIR)
+        save_file(movie_file, generic_name, video_format, MOVIES_DIR)
 
         data = request.form.to_dict()
-        data.update({"thumbnail_url": f"{filename}.{THUMBNAIL_EXT}"})
-        data.update({"video_url": f"{filename}.{MOVIE_EXT}"})
+        data.update({"thumbnail_url": f"{generic_name}.{THUMBNAIL_EXT}"})
+        data.update({"video_url": f"{generic_name}.{video_format}"})
+
         movie_services.add_movie(**data)
 
     return render_template("upload_movie.html")
