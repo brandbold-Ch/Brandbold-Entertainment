@@ -3,7 +3,7 @@ from models.base_user_model import BaseUser
 
 
 class Plan(Enum):
-    FREE = "free"
+    FREE = "$0"
     MONTH = "$150"
     YEAR = "$1200"
 

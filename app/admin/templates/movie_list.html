@@ -3,7 +3,37 @@
 {% block title %}Upload Movie{% endblock %}
 
 {% block content %}
-<style xmlns="http://www.w3.org/1999/html">
+<style>
+    /* Estilos de mensaje de éxito */
+    .message {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        animation: fadeOut 5s ease forwards;
+    }
+
+    .message-success {
+        background-color: #2ecc71;
+    }
+
+    @keyframes fadeOut {
+        0% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
     /* Table styling */
     .table-container {
         background-color: #333333;
@@ -50,46 +80,26 @@
     }
 
     .btn-action:hover {
-        background-color: #c0392b;  /* Rojo más oscuro */
+        background-color: #c0392b;
     }
 
-    .btn-action.delete {
-        background-color: #c0392b;  /* Rojo oscuro */
-    }
-
-    .btn-action.delete:hover {
-        background-color: #e74c3c;
-    }
-
-    /* Remove underline and blue color from <a> inside .btn-action */
     .btn-action a {
-        text-decoration: none; /* Remove underline */
-        color: inherit; /* Inherit color from the button */
+        text-decoration: none;
+        color: inherit;
     }
 
-    /* Image next to title */
     .movie-title {
         display: flex;
         align-items: center;
     }
 
     .movie-title img {
-        max-width: 40px; /* Ajusta el tamaño de la imagen */
+        max-width: 40px;
         margin-right: 10px;
         border-radius: 5px;
     }
 
-    /* Responsive styles */
     @media (max-width: 600px) {
-        .sidebar {
-            width: 200px;
-        }
-
-        .main-content {
-            margin-left: 220px;
-            padding: 10px;
-        }
-
         table {
             font-size: 14px;
         }
@@ -104,6 +114,10 @@
         }
     }
 </style>
+
+<!-- Mensaje dinámico -->
+<div id="message-container"></div>
+
 <div class="table-container">
     <table>
         <thead>
@@ -115,22 +129,53 @@
             </tr>
         </thead>
         <tbody>
-            {% for movie in movies %}
-            <tr>
+            {% for movie in data %}
+            <tr id="movie-row-{{ movie.id }}">
                 <td class="movie-title">
-                    <img src="{{ url_for('static', filename='thumbnail/' ~ movie.thumbnail_url) }}" alt="Imagen de película"> <!-- Reemplaza por una imagen real -->
+                    <img src="{{ url_for('static', filename='thumbnail/' ~ movie.thumbnail_url) }}" alt="Imagen de película">
                     {{ movie.title }}
                 </td>
                 <td>{{ movie.release_year }}</td>
                 <td>{{ movie.genre }}</td>
                 <td>
-                    <button class="btn-action"><a href="{{ url_for('admin.video_streaming', movie_path=movie.video_url) }}">Ver</a></button>
-                    <button class="btn-action delete">Eliminar</button>
+                    <button class="btn-action">
+                        <a href="{{ url_for('admin.video_streaming', movie_path=movie.video_url) }}">Ver</a>
+                    </button>
+                    <button class="btn-action">
+                        <a href="{{ url_for('admin.update_movie', movie_data=movie) }}">Actualizar</a>
+                    </button>
+                    <button class="btn-action delete" onclick="deleteMovie('{{ movie.id }}')">Eliminar</button>
                 </td>
             </tr>
             {% endfor %}
-            <!-- More movies can be added here -->
         </tbody>
     </table>
 </div>
+
+<script>
+    function deleteMovie(movieId) {
+        fetch(`/admin/delete_movie/${movieId}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            if (data.message) {
+                const messageContainer = document.getElementById('message-container');
+                const successMessage = document.createElement('div');
+                successMessage.classList.add('message', 'message-success');
+                successMessage.innerText = data.message;
+                messageContainer.appendChild(successMessage);
+
+                const row = document.getElementById(`movie-row-${movieId}`);
+                if (row) row.remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error al eliminar la película:', error);
+        });
+    }
+</script>
+
 {% endblock %}
