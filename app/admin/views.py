@@ -1,4 +1,3 @@
-
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, Response, make_response
 from uuid import uuid4
 from os import path

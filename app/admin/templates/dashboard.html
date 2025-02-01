@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - {% block title %}BrandBold Entertainment{% endblock %}</title>
     <style>
-        /* General reset for margin and padding */
+        /* General reset */
         * {
             margin: 0;
             padding: 0;
@@ -14,20 +14,18 @@
 
         /* Body styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #000000;  /* Fondo negro */
-            color: #ffffff;  /* Texto blanco */
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a2e; /* Modern dark blue */
+            color: #eaeaea; /* Light gray */
             display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
             height: 100vh;
             flex-direction: column;
         }
 
         /* Sidebar styling */
         .sidebar {
-            background-color: #333333;  /* Caja oscura */
-            width: 250px;
+            background-color: #16213e; /* Dark blue */
+            width: 260px;
             height: 100vh;
             padding: 20px;
             display: flex;
@@ -35,128 +33,101 @@
             position: fixed;
             top: 0;
             left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
         }
 
         .sidebar .header-image {
             width: 100%;
-            height: 120px;  /* Ajusta la altura de la imagen */
+            height: 120px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
 
         .sidebar h1 {
-            color: #e74c3c;  /* Rojo */
-            margin-bottom: 30px;
+            color: #f05454; /* Modern coral */
             font-size: 24px;
+            margin-bottom: 30px;
             text-align: center;
         }
 
         .sidebar ul {
-            list-style-type: none;
-            padding: 0;
+            list-style: none;
         }
 
         .sidebar ul li {
-            margin: 20px 0;
-            text-align: center;
+            margin: 15px 0;
         }
 
         .sidebar ul li a {
-            color: #ffffff;
+            color: #eaeaea;
             font-size: 18px;
             text-decoration: none;
             display: block;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
         }
 
         .sidebar ul li a:hover {
-            background-color: #e74c3c;  /* Rojo */
+            background-color: #f05454; /* Coral */
+            transform: translateX(10px);
         }
 
         /* Main content area */
         .main-content {
-            margin-left: 270px;
-            padding: 20px;
-            width: calc(100% - 270px);
+            margin-left: 280px;
+            padding: 30px;
+            flex-grow: 1;
         }
 
         .main-content h2 {
-            color: #e74c3c;
+            color: #f05454;
+            font-size: 28px;
             margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
-        /* Section cards */
+        /* Cards */
         .section-card {
-            background-color: #333333;
-            padding: 20px;
+            background-color: #0f3460; /* Deep blue */
+            padding: 25px;
             margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .section-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .section-card h3 {
-            color: #ffffff;
-            margin-bottom: 20px;
-            font-size: 24px;
+            color: #eaeaea;
+            font-size: 22px;
+            margin-bottom: 15px;
         }
 
         /* Responsive styles */
         @media (max-width: 768px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 240px;
+            }
+        }
+
+        @media (max-width: 480px) {
             .sidebar {
                 width: 200px;
             }
 
             .main-content {
                 margin-left: 220px;
-                width: calc(100% - 220px);
-            }
-
-            .sidebar h1 {
-                font-size: 20px;
-            }
-
-            .sidebar ul li a {
-                font-size: 16px;
-                padding: 8px;
-            }
-
-            .main-content h2 {
-                font-size: 22px;
-            }
-
-            .section-card h3 {
-                font-size: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sidebar {
-                width: 180px;
-            }
-
-            .main-content {
-                margin-left: 200px;
-                width: calc(100% - 200px);
-            }
-
-            .sidebar h1 {
-                font-size: 18px;
-            }
-
-            .sidebar ul li a {
-                font-size: 14px;
-                padding: 6px;
-            }
-
-            .main-content h2 {
-                font-size: 20px;
-            }
-
-            .section-card h3 {
-                font-size: 18px;
+                padding: 20px;
             }
         }
     </style>
@@ -164,16 +135,16 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Image in sidebar -->
         <img src="../static/images/brand.png" alt="Brand Image" class="header-image">
-        <h1>Administrador</h1>
+        <h1>Admin Panel</h1>
         <ul>
-            <li><a href="/admin">Dashboard</a></li>
-            <li><a href="/admin/user_list">Usuarios</a></li>
-            <li><a href="/admin/movie_list">Películas</a></li>
-            <li><a href="/admin/upload_movie">Subir Película</a></li>
-            <li><a href="#">Configuración</a></li>
-            <li><a href="#">Cerrar Sesión</a></li>
+            <li><a href="/admin/user_list">Users</a></li>
+            <li><a href="/admin/movie_list">Movies</a></li>
+            <li><a href="">Categories</a></li>
+            <li><a href="">Franchises</a></li>
+            <li><a href="/admin/upload_movie">Upload Movie</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="#">Log Out</a></li>
         </ul>
     </div>
 
@@ -181,7 +152,12 @@
     <div class="main-content">
         <h2>Admin Dashboard</h2>
 
-        <!-- Subir Nueva Película -->
+        <!-- Content Placeholder -->
+        <div class="section-card">
+            <h3>Welcome to the Admin Dashboard</h3>
+            <p>Manage all the functionalities of your platform from here. Navigate using the sidebar for quick access.</p>
+        </div>
+
         {% block content %}
         {% endblock %}
 
