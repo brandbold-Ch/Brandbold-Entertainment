@@ -8,6 +8,7 @@ from app.exceptions.exceptions import BaseServerException
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 7 * 1024 * 1024 * 1024  # 5 GB
 jwt = JWTManager(app)
 
 
