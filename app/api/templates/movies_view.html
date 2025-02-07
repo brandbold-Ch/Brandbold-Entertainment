@@ -1,0 +1,282 @@
+{% extends 'dashboard_view.html' %}
+
+{% block title %}Manage Movies{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos generales */
+    body {
+        font-family: Arial, sans-serif;
+        background: #181818;
+        color: white;
+    }
+
+    /* Contenedor de la tabla más ancho */
+    .table-container {
+        background-color: #222;
+        padding: 25px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s, box-shadow 0.3s;
+        max-width: 100%;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #444;
+    }
+
+    th {
+        background-color: #444;
+        color: white;
+    }
+
+    td {
+        color: #ddd;
+    }
+
+    tr:hover {
+        background-color: #333;
+    }
+
+    /* Estilos para las etiquetas de género */
+    .genre-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .genre-tag {
+        background-color: #3498db; /* Azul */
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    /* Diferentes colores para variedad */
+    .genre-tag:nth-child(2n) { background-color: #e74c3c; } /* Rojo */
+    .genre-tag:nth-child(3n) { background-color: #2ecc71; } /* Verde */
+    .genre-tag:nth-child(4n) { background-color: #f1c40f; } /* Amarillo */
+    .genre-tag:nth-child(5n) { background-color: #9b59b6; } /* Morado */
+
+    /* Botones */
+    .btn-action {
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .btn-action:hover {
+        background-color: #c0392b;
+    }
+
+    /* Formulario de actualización */
+    .form-update {
+        display: none;
+        background: rgba(51, 51, 51, 0.95);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        max-width: 400px;
+        width: 90%;
+        color: white;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        backdrop-filter: blur(10px);
+        transition: 0.3s ease-in-out;
+    }
+
+    .form-update h3 {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #f1c40f;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: #ddd;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: none;
+        background: #444;
+        color: white;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background-color: #3498db;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .btn-submit:hover {
+        background-color: #2980b9;
+    }
+
+    .btn-cancel {
+        width: 100%;
+        background-color: #e74c3c;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+
+    .movie-thumbnail img {
+        max-width: 50px;
+        border-radius: 5px;
+    }
+
+    .btn-cancel:hover {
+        background-color: #c0392b;
+    }
+</style>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Genres</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movie in data %}
+            <tr id="movie-row-{{ movie.id }}">
+                <td class="movie-thumbnail">
+                    <img src="{{ url_for('static', filename='thumbnail/' ~ movie.thumbnail_url) }}" alt="Movie Image">
+                </td>
+                <td class="movie-title">{{ movie.title }}</td>
+                <td>{{ movie.release_year }}</td>
+                <td>
+                    <div class="genre-tags">
+                        {% for genre in movie.genres %}
+                            <span class="genre-tag">{{ genre.genre_name.value }}</span>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>{{ movie.description }}</td>
+                <td>
+                    <button class="btn-action">
+                        <a href="{{ url_for('admin.video_streaming_view', movie_path=movie.video_url) }}" style="color: inherit; text-decoration: none;">Watch</a>
+                    </button>
+                    <button class="btn-action" onclick="showUpdateForm('{{ movie.id }}', '{{ movie.title }}', '{{ movie.release_year }}', '{{ movie.description }}', '{{ movie.duration }}')">Update</button>
+                    <button class="btn-action delete" onclick="deleteMovie('{{ movie.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Formulario de actualización -->
+<div class="form-update" id="update-form">
+    <h3>Update Movie</h3>
+    <input type="hidden" name="movie_id" id="movie_id">
+    <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" name="title" id="title" required>
+    </div>
+    <div class="form-group">
+        <label for="release_year">Release Year:</label>
+        <input type="number" name="release_year" id="release_year">
+    </div>
+    <div class="form-group">
+        <label for="description">Description:</label>
+        <input type="text" name="description" id="description" required>
+    </div>
+    <div class="form-group">
+        <label for="duration">Duration:</label>
+        <input type="text" name="" id="duration" required>
+    </div>
+    <button type="submit" class="btn-submit" onclick="updateMovie()">Update</button>
+    <button type="button" class="btn-cancel" onclick="hideUpdateForm()">Cancel</button>
+</div>
+
+<script>
+    function deleteMovie(movieId) {
+        fetch(`/admins/movies/${movieId}`, { method: 'DELETE' })
+        .then(() => {
+            location.reload();
+        });
+    }
+
+    function showUpdateForm(id, title, release_year, description, duration) {
+        document.getElementById("update-form").style.display = "block";
+        document.getElementById("movie_id").value = id;
+        document.getElementById("title").value = title;
+        document.getElementById("release_year").value = release_year;
+        document.getElementById("description").value = description;
+        document.getElementById("duration").value = duration;
+    }
+
+    function hideUpdateForm() {
+        document.getElementById("update-form").style.display = "none";
+    }
+
+    function updateMovie() {
+        const movieId = document.getElementById("movie_id").value;
+        const title = document.getElementById("title").value;
+        const releaseYear = document.getElementById("release_year").value;
+        const description = document.getElementById("description").value;
+        const duration = document.getElementById("duration").value;
+
+        fetch(`/admins/movies/${movieId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title,
+                release_year: releaseYear,
+                description: description,
+                duration: duration
+            })
+        })
+        .then(response => {
+            location.reload();
+        })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'dashboard_view.html' %}
+
+{% block title %}User list{% endblock %}
+
+{% block content %}
+<style>
+    /* Table styling */
+    .table-container {
+        background-color: #333333;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #444;
+    }
+
+    th {
+        background-color: #444;
+        color: #ffffff;
+    }
+
+    td {
+        color: #cccccc;
+    }
+
+    tr:hover {
+        background-color: #555;
+    }
+
+    .btn-action {
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-action:hover {
+        background-color: #c0392b;  /* Rojo más oscuro */
+    }
+
+    .btn-action.delete {
+        background-color: #c0392b;  /* Rojo oscuro */
+    }
+
+    .btn-action.delete:hover {
+        background-color: #e74c3c;
+    }
+
+    .btn-action.deactivate {
+        background-color: #f39c12;  /* Amarillo */
+    }
+
+    .btn-action.deactivate:hover {
+        background-color: #e67e22;  /* Naranja oscuro */
+    }
+
+    /* Responsive styles */
+    @media (max-width: 600px) {
+        .sidebar {
+            width: 200px;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 10px;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .btn-action {
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+    }
+</style>
+<div class="table-container">
+    <h3>List Users</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Created At</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in data %}
+                <tr>
+                    <td>{{ user.auth.username }}</td>
+                    <td>{{ user.auth.email }}</td>
+                    <td>{{ user.created_at }}</td>
+                    <td>{{ user.last_login }}</td>
+                    <td>
+                        <button class="btn-action" onclick="">Update</button>
+                        <button class="btn-action on deactivate" onclick="">Deactivate</button>
+                        <button class="btn-action delete" onclick="deleteUser('{{ user.id }}')">Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            <!-- More users can be added here -->
+        </tbody>
+    </table>
+</div>
+<script>
+    function deleteUser(userId) {
+        fetch(`/admins/users/${userId}`, { method: 'DELETE' })
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => console.error('Error al eliminar la categoría:', error));
+    }
+</script>
+{% endblock %}

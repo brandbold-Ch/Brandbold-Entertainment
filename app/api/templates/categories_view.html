@@ -1,0 +1,142 @@
+{% extends 'dashboard_view.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<style>
+    .message {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        animation: fadeOut 5s ease forwards;
+    }
+
+    .message-success {
+        background-color: #2ecc71;
+    }
+
+    @keyframes fadeOut {
+        0% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .table-container {
+        background-color: #333333;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #444;
+    }
+
+    th {
+        background-color: #444;
+        color: #ffffff;
+    }
+
+    td {
+        color: #cccccc;
+    }
+
+    tr:hover {
+        background-color: #555;
+    }
+
+    .btn-action {
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-action:hover {
+        background-color: #c0392b;
+    }
+
+    @media (max-width: 600px) {
+        table {
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .btn-action {
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+    }
+</style>
+
+<div id="message-container"></div>
+
+<div class="table-container">
+    <h2>Categories</h2>
+    <form id="category-form" method="POST" action="/admin/genres" enctype="multipart/form-data">
+        <input type="text" name="genre_name" id="genre_name" placeholder="Enter category name" required>
+        <button type="submit" class="btn-action">Add Genre</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="category-table">
+            {% for genre in data %}
+                <tr id="category-row-{{ genre.id }}">
+                    <td>{{ genre.id }}</td>
+                    <td>{{ genre.genre_name.value }}</td>
+                    <td>
+                        <button class="btn-action edit">Edit</button>
+                        <button class="btn-action delete" onclick="deleteCategory('{{ genre.id }}')">Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    function deleteCategory(genreId) {
+        fetch(`/admins/genres/${genreId}`, { method: 'DELETE' })
+        .then(() => {
+            const row = document.getElementById(`category-row-${genreId}`);
+            if (row) {
+                row.remove();
+            }
+
+            const messageContainer = document.getElementById('message-container');
+            const successMessage = document.createElement('div');
+            successMessage.classList.add('message', 'message-success');
+            successMessage.innerText = "Category deleted successfully";
+            messageContainer.appendChild(successMessage);
+        })
+        .catch(error => console.error('Error al eliminar la categoría:', error));
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'dashboard_view.html' %}
+
+{% block title %}Franchise Management - BrandBold Entertainment{% endblock %}
+
+{% block content %}
+    <!-- Franchise Creation Form -->
+    <div class="section-card">
+        <h3>Create New Franchise</h3>
+        <form action="/admin/franchises" method="POST">
+            <label for="franchise_name" style="color: #eaeaea; font-size: 18px;">Franchise Name:</label><br>
+            <input type="text" id="franchise_name" name="name" required placeholder="Enter Franchise Name" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc;"/><br>
+
+            <label for="franchise_description" style="color: #eaeaea; font-size: 18px;">Franchise Description:</label><br>
+            <textarea id="franchise_description" name="description" required placeholder="Enter Franchise Description" rows="5" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;"></textarea><br>
+
+            <button type="submit" style="background-color: #f05454; color: #fff; padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;">Create Franchise</button>
+        </form>
+    </div>
+
+    <!-- Franchise List -->
+    <div class="section-card">
+        <h3>Franchise List</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <thead>
+                <tr style="background-color: #444; color: #fff;">
+                    <th style="padding: 10px; border: 1px solid #ccc;">ID</th>
+                    <th style="padding: 10px; border: 1px solid #ccc;">Name</th>
+                    <th style="padding: 10px; border: 1px solid #ccc;">Description</th>
+                    <th style="padding: 10px; border: 1px solid #ccc;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for franchise in data %}
+                <tr style="background-color: #222; color: #eaeaea;">
+                    <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">{{ franchise.id }}</td>
+                    <td style="padding: 10px; border: 1px solid #ccc;">{{ franchise.name }}</td>
+                    <td style="padding: 10px; border: 1px solid #ccc;">{{ franchise.description }}</td>
+                    <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                            <!-- Edit Button -->
+                            <a href="/admin/franchises/{{ franchise.id }}" style="background-color: #008CBA; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; display: inline-block;">Edit</a>
+
+                            <!-- Delete Button -->
+                            <button type="submit" onclick="deleteFranchise('{{ franchise.id }}');" style="background-color: #f05454; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">Delete</button>
+
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 10px; text-align: center; color: #eaeaea;">No franchises available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+    function deleteFranchise(franchiseId) {
+        fetch(`/admins/franchises/${franchiseId}`, { method: 'DELETE' })
+        .then(() => {
+            location.reload()
+        })
+    }
+</script>
+{% endblock %}
