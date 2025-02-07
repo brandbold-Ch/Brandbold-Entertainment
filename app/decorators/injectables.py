@@ -15,7 +15,7 @@ def injectable_entity(model, only_parse=False, index=None):
                 if not data:
                     raise NotFound(f"{model.__name__} not found with ID {entity_id}")
 
-                kwargs["inject"] = data
+                kwargs[model.__name__.lower()] = data
                 return func(self, *args, **kwargs)
 
             else:

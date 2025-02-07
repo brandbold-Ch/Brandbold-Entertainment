@@ -12,3 +12,7 @@ class Franchise(SQLModel, table=True):
         back_populates="franchises",
         link_model=MovieFranchise
     )
+
+    def update_fields(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)

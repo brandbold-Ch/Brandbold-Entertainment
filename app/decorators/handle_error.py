@@ -1,8 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, DBAPIError
 from functools import wraps
-
-from sqlmodel import Session
-
 from app.exceptions.exceptions import *
 
 
@@ -28,4 +25,5 @@ def handle_error(func):
 
         except ValueError as e:
             raise DataValidationError(e.__repr__())
+
     return wrapper

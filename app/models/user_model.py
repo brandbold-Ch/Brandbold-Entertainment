@@ -13,4 +13,5 @@ class Plan(Enum):
 
 class User(BaseUser, table=True):
     subscription_plan: Plan = Plan.FREE
-    auth: "Auth" = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    auth: "Auth" = Relationship(back_populates="user",
+                                sa_relationship_kwargs={"cascade": "all, delete-orphan"})

@@ -3,12 +3,12 @@ from app.exceptions.codes import *
 
 class BaseServerException(Exception):
     def __init__(
-            self,
-            message: str,
-            code: int = HTTPCodes.INTERNAL_SERVER_ERROR.value,
-            error_type: str = HTTPCodes.INTERNAL_SERVER_ERROR.name,
-            details: any = None
-            ) -> None:
+        self,
+        message: str,
+        code: int = HTTPCodes.INTERNAL_SERVER_ERROR.value,
+        error_type: str = HTTPCodes.INTERNAL_SERVER_ERROR.name,
+        details: any = None
+    ) -> None:
         super().__init__(message)
         self.message = message
         self.code = code

@@ -16,8 +16,8 @@ class Movie(SQLModel, table=True):
     release_year: int
     rating: Optional[float] = None
     duration: str
-    thumbnail_url: str
-    video_url: str
+    thumbnail_url: Optional[str] = None
+    video_url: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now())
     updated_at: Optional[datetime] = None
     genres: List["Genre"] = Relationship(
@@ -28,4 +28,9 @@ class Movie(SQLModel, table=True):
         back_populates="movies",
         link_model=MovieFranchise
     )
+
+    def update_fields(self, **kwargs):
+        self.updated_at = datetime.now()
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 

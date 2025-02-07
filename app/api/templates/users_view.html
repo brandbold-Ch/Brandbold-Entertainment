@@ -95,49 +95,42 @@
     }
 </style>
 <div class="table-container">
-    <h3>Lista de Usuarios</h3>
+    <h3>List Users</h3>
     <table>
         <thead>
             <tr>
-                <th>Nombre</th>
+                <th>Username</th>
                 <th>Email</th>
-                <th>Fecha de Registro</th>
-                <th>Acciones</th>
+                <th>Created At</th>
+                <th>Last Login</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Juan Pérez</td>
-                <td>juan@ejemplo.com</td>
-                <td>01/01/2024</td>
-                <td>
-                    <button class="btn-action">Editar</button>
-                    <button class="btn-action deactivate">Desactivar</button>
-                    <button class="btn-action delete">Eliminar</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Maria Gómez</td>
-                <td>maria@ejemplo.com</td>
-                <td>15/03/2023</td>
-                <td>
-                    <button class="btn-action">Editar</button>
-                    <button class="btn-action deactivate">Desactivar</button>
-                    <button class="btn-action delete">Eliminar</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Carlos Rodríguez</td>
-                <td>carlos@ejemplo.com</td>
-                <td>10/05/2023</td>
-                <td>
-                    <button class="btn-action">Editar</button>
-                    <button class="btn-action deactivate">Desactivar</button>
-                    <button class="btn-action delete">Eliminar</button>
-                </td>
-            </tr>
+            {% for user in data %}
+                <tr>
+                    <td>{{ user.auth.username }}</td>
+                    <td>{{ user.auth.email }}</td>
+                    <td>{{ user.created_at }}</td>
+                    <td>{{ user.last_login }}</td>
+                    <td>
+                        <button class="btn-action" onclick="">Update</button>
+                        <button class="btn-action on deactivate" onclick="">Deactivate</button>
+                        <button class="btn-action delete" onclick="deleteUser('{{ user.id }}')">Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
             <!-- More users can be added here -->
         </tbody>
     </table>
 </div>
+<script>
+    function deleteUser(userId) {
+        fetch(`/admins/users/${userId}`, { method: 'DELETE' })
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => console.error('Error al eliminar la categoría:', error));
+    }
+</script>
 {% endblock %}

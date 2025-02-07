@@ -7,25 +7,20 @@ from app.models import Franchise
 
 class FranchiseService:
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session) -> None:
         self.session = session
 
     @handle_error
     @injectable_entity(Franchise, only_parse=True, index=0)
     def create_franchise(self, franchise) -> None:
-        print(franchise)
-        franchise = Franchise(**franchise)
-        self.session.add(franchise)
+        self.session.add(Franchise(**franchise))
         self.session.commit()
 
     @handle_error
     @injectable_entity(Franchise)
-    def update_franchise(self, franchise_id, **kwargs) -> None:
-        franchise = Franchise.model_validate(kwargs)
-        query = (update(Franchise)
-                 .where(Franchise.id == franchise_id)
-                 .values(**franchise.model_dump(exclude_unset=True)))
-        self.session.exec(query)
+    def update_franchise(self, franchise_id: str,
+                         franchise: Franchise, **kwargs) -> None:
+        franchise.update_fields(**kwargs)
         self.session.commit()
 
     @handle_error
@@ -34,6 +29,7 @@ class FranchiseService:
 
     @handle_error
     @injectable_entity(Franchise)
-    def delete_franchise(self, franchise_id, inject=None) -> None:
-        self.session.delete(inject)
+    def delete_franchise(self, franchise_id: str,
+                         franchise: Franchise) -> None:
+        self.session.delete(franchise)
         self.session.commit()

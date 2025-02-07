@@ -35,3 +35,7 @@ class Genre(SQLModel, table=True):
         back_populates="genres",
         link_model=MovieGenre
     )
+
+    def update_fields(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)

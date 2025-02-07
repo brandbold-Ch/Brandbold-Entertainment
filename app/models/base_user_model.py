@@ -10,3 +10,7 @@ class BaseUser(SQLModel):
     last_name: str
     created_at: datetime = Field(default_factory=lambda: datetime.now())
     last_login: Optional[datetime] = None
+
+    def update_fields(self, **kwargs) -> None:
+        for k, v in kwargs.items():
+            setattr(self, k, v)

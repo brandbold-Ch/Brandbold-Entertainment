@@ -121,10 +121,9 @@
         </tbody>
     </table>
 </div>
-
 <script>
     function deleteCategory(genreId) {
-        fetch(`/admin/genres/${genreId}`, { method: 'DELETE' })
+        fetch(`/admins/genres/${genreId}`, { method: 'DELETE' })
         .then(() => {
             const row = document.getElementById(`category-row-${genreId}`);
             if (row) {

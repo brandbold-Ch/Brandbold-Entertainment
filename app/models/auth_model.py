@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Type, Any, Union, Dict
+from typing import Optional
 
 from sqlmodel import Field, SQLModel, Relationship
 from uuid import UUID, uuid4
@@ -13,6 +13,11 @@ class Roles(Enum):
     ADMIN = "admin"
 
 
+class Status(Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+
+
 class Auth(SQLModel, table=True):
     id: UUID = Field(default_factory=lambda: uuid4(), primary_key=True, index=True)
     user_id: Optional[UUID] = Field(foreign_key="user.id", default=None, ondelete="CASCADE")
@@ -22,6 +27,7 @@ class Auth(SQLModel, table=True):
     password: str
     created_at: datetime = Field(default_factory=lambda: datetime.now())
     role: Roles = Roles.USER
+    status: Status = Status.ACTIVE
     admin: "Admin" = Relationship(back_populates="auth", sa_relationship_kwargs={'uselist': False})
     user: "User" = Relationship(back_populates="auth", sa_relationship_kwargs={'uselist': False})
 

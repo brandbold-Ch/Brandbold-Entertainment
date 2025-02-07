@@ -1,57 +1,21 @@
 from app.config.sqlmodel_config import engine
 from app.services.admin_services import AdminService
+from app.services.auth_services import AuthService
 from flask import Blueprint, request, jsonify, Response, render_template
 from app.exceptions.exceptions import DataValidationError
 from sqlmodel import Session
-from app.services import MovieService, GenreService, FranchiseService
-from uuid import uuid4
-from os import path
+from app.services import MovieService, GenreService, FranchiseService, UserServices
 from werkzeug.datastructures import FileStorage
 
 admin_bl = Blueprint("admin", __name__,
-                     url_prefix="/admin",
+                     url_prefix="/admins",
                      template_folder="../templates")
-admin = AdminService(Session(engine))
+admin_service = AdminService(Session(engine))
 movie_services = MovieService(Session(engine))
 genre_service = GenreService(Session(engine))
 franchise_service = FranchiseService(Session(engine))
-
-RESOURCES_DIR = "../../../../static"
-THUMBNAIL_DIR = "thumbnail"
-MOVIES_DIR = "movies"
-THUMBNAIL_EXT = "webp"
-
-
-def res_path(file: str, _type: str, _dir: str) -> str:
-    filename = f"{RESOURCES_DIR}/{_dir}/{file}.{_type}"
-    return path.abspath(path.join(__file__, filename))
-
-
-def select_format(content: str) -> str:
-    match content:
-        case "video/mp4":
-            return "mp4"
-        case "video/x-matroska":
-            return "mkv"
-        case "video/webm":
-            return "webm"
-        case "video/ogg":
-            return "ogg"
-        case "video/avi":
-            return "avi"
-
-
-def save_file(file: FileStorage, filename: str,
-              extension: str, directory: str) -> None:
-    file_path = res_path(filename, extension, directory)
-    with open(file_path, "wb") as f:
-        f.write(file.read())
-
-
-@admin_bl.route("/delete_movie/<uuid:movie_id>", methods=["DELETE"])
-def delete_movie(movie_id) -> Response:
-    movie_services.delete_movie(movie_id)
-    return jsonify({"message": "Película Eliminada Correctamente"})
+user_service = UserServices(Session(engine))
+auth_service = AuthService(Session(engine))
 
 
 @admin_bl.route("/", methods=["GET"])
@@ -73,47 +37,54 @@ def franchises_view(franchise_id=None) -> str:
     return render_template("franchises_view.html", data=franchises)
 
 
-@admin_bl.route("/movies", methods=["GET", "POST"])
-def movies_view() -> str:
+@admin_bl.route("/movies", methods=["GET"])
+@admin_bl.route("/movies/<uuid:movie_id>", methods=["PUT", "DELETE"])
+def movies_view(movie_id=None) -> str:
+    if request.method == "DELETE":
+        movie_services.delete_movie(movie_id)
+
+    elif request.method == "PUT":
+        movie_services.update_movie(movie_id, **request.get_json())
+
     movies = movie_services.get_movies()
     return render_template("movies_view.html", data=movies)
 
 
-@admin_bl.route("/update_movie/<movie_data>", methods=["GET"])
-def update_movie(movie_data) -> str:
-    return render_template("update_movie.html", data=movie_data)
-
-
-@admin_bl.route("/upload_movie", methods=["GET", "POST"])
-def upload_movie() -> str:
+@admin_bl.route("/movies/upload", methods=["GET", "POST"])
+def upload_movie_view() -> str:
     if request.method == "POST":
-        movie_file: FileStorage = request.files.get("video_url")
+        video_file: FileStorage = request.files.get("video_url")
         thumb_file: FileStorage = request.files.get("thumbnail_url")
         genres = request.form.getlist("genre")
         franchises = request.form.getlist("franchise")
-        generic_name = uuid4().__str__()
-
-        video_format = select_format(movie_file.content_type)
-        save_file(thumb_file, generic_name, THUMBNAIL_EXT, THUMBNAIL_DIR)
-        save_file(movie_file, generic_name, video_format, MOVIES_DIR)
-
         data = request.form.to_dict()
-        data.update({"thumbnail_url": f"{generic_name}.{THUMBNAIL_EXT}"})
-        data.update({"video_url": f"{generic_name}.{video_format}"})
 
-        movie_services.create_movie(data, genres, franchises)
+        movie_services.create_movie(data, genres, franchises,
+                                    thumb_file, video_file)
 
     genres = genre_service.get_genres()
     franchises = franchise_service.get_franchises()
     return render_template(
         "upload_movie.html",
-        data={"genres": genres, "franchises": franchises}
+        data={
+            "genres": genres,
+            "franchises": franchises
+        }
     )
 
 
-@admin_bl.route("/user_list", methods=["GET", "POST"])
-def users_view() -> str:
-    return render_template("users_view.html")
+@admin_bl.route("/users", methods=["GET"])
+@admin_bl.route("/users/<uuid:user_id>", methods=["PUT", "DELETE"])
+def users_view(user_id=None) -> str:
+    if request.method == "DELETE":
+        user_service.delete_user(user_id)
+
+    elif request.method == "PUT":
+        auth_service.update_status()
+        ...
+
+    users = user_service.get_users()
+    return render_template("users_view.html", data=users)
 
 
 @admin_bl.route("/video_streaming/<movie_path>", methods=["GET"])
@@ -136,28 +107,30 @@ def genres_view(genre_id=None) -> str:
 
 
 @admin_bl.route("/<uuid:admin_id>", methods=["GET"])
-def get_admin(admin_id) -> dict:
-    return admin.get_admin(admin_id)
+def get_admin(admin_id) -> tuple[Response, int]:
+    admin = admin_service.get_admin(admin_id)
+    return jsonify(admin), 200
 
 
 @admin_bl.route("/", methods=["POST"])
-def create_admin() -> Response:
+def create_admin() -> tuple[Response, int]:
     data = request.get_json()
 
     if "admin" not in data or "auth" not in data:
         raise DataValidationError("Don't found admin key or auth key")
 
-    result = admin.create_admin(data["admin"], data["auth"])
-    return jsonify(result)
+    result = (admin_service
+              .create_admin(data["admin"], data["auth"]))
+    return jsonify(result), 201
 
 
 @admin_bl.route("/<uuid:admin_id>", methods=["PUT"])
-def update_admin(admin_id) -> Response:
-    data = admin.update_admin(admin_id, **request.get_json())
-    return jsonify(data)
+def update_admin(admin_id) -> tuple[Response, int]:
+    data = admin_service.update_admin(admin_id, **request.get_json())
+    return jsonify(data), 202
 
 
 @admin_bl.route("/<uuid:admin_id>", methods=["DELETE"])
-def delete_admin(admin_id) -> Response:
-    data = admin.delete_admin(admin_id)
-    return jsonify(data)
+def delete_admin(admin_id) -> tuple[Response, int]:
+    data = admin_service.delete_admin(admin_id)
+    return jsonify(data), 200
