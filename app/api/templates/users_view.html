@@ -115,7 +115,7 @@
                     <td>{{ user.last_login }}</td>
                     <td>
                         <button class="btn-action" onclick="">Update</button>
-                        <button class="btn-action on deactivate" onclick="">Deactivate</button>
+                        <button class="btn-action on deactivate" onclick="changeStatus('{{ user.auth.id }}', '{{ user.auth.status.value }}')">{{ user.auth.status.value.title() }}</button>
                         <button class="btn-action delete" onclick="deleteUser('{{ user.id }}')">Delete</button>
                     </td>
                 </tr>
@@ -131,6 +131,27 @@
             location.reload();
         })
         .catch(error => console.error('Error al eliminar la categoría:', error));
+    }
+
+    function changeStatus(userId, status) {
+        const choices = {
+            active: 'inactive',
+            inactive: 'active'
+        };
+
+        fetch(`/admins/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status: choices[status]
+            })
+        })
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => console.error('Error al actualizar status:', error));
     }
 </script>
 {% endblock %}

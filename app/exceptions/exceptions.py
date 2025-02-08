@@ -1,27 +1,32 @@
 from app.exceptions.codes import *
 
 
-class BaseServerException(Exception):
+class BaseExceptionError(Exception):
     def __init__(
         self,
         message: str,
-        code: int = HTTPCodes.INTERNAL_SERVER_ERROR.value,
-        error_type: str = HTTPCodes.INTERNAL_SERVER_ERROR.name,
-        details: any = None
+        error_code: ErrorCodes,
+        http_code: HTTPCodes,
+        details: any
     ) -> None:
         super().__init__(message)
         self.message = message
-        self.code = code
-        self.error_type = error_type
+        self.error_code = int(error_code.value)
+        self.error_name = error_code.name
+        self.http_code = int(http_code.value)
+        self.http_name = http_code.name
         self.details = details
 
     def to_dict(self) -> dict:
         error_response = {
-            "status": "error",
-            "error": {
-                "type": self.error_type,
+            "details": {
                 "message": self.message,
-                "code": self.code,
+                "HttpName": self.http_name,
+                "ErrorName": self.error_name,
+            },
+            "codes": {
+                "httpCode": self.http_code,
+                "errorCode": self.error_code,
             }
         }
         if self.details:
@@ -29,86 +34,206 @@ class BaseServerException(Exception):
         return error_response
 
 
-class FileNotFound(BaseServerException):
+class FileNotFoundException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.FILE_NOT_FOUND.value, error_type=HTTPCodes.NOT_FOUND.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.FILE_NOT_FOUND, http_code=HTTPCodes.NOT_FOUND, details=details)
 
 
-class DuplicatedRecord(BaseServerException):
+class DuplicatedRecordException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.DB_DUPLICATED_KEY.value, error_type=HTTPCodes.BAD_REQUEST.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.DB_DUPLICATED_KEY, http_code=HTTPCodes.BAD_REQUEST, details=details)
 
 
-class NotFound(BaseServerException):
+class NotFoundException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.DB_NOT_FOUND.value, error_type=HTTPCodes.NOT_FOUND.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.DB_NOT_FOUND, http_code=HTTPCodes.NOT_FOUND, details=details)
 
 
-class InvalidToken(BaseServerException):
+class InvalidTokenException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.INVALID_TOKEN.value, error_type=HTTPCodes.UNAUTHORIZED.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.INVALID_TOKEN, http_code=HTTPCodes.UNAUTHORIZED, details=details)
 
 
-class PasswordMismatch(BaseServerException):
+class PasswordMismatchException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.PASSWORD_DO_NOT_MATCH.value, error_type=HTTPCodes.FORBIDDEN.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.PASSWORD_DO_NOT_MATCH, http_code=HTTPCodes.FORBIDDEN, details=details)
 
 
-class ExpiredToken(BaseServerException):
+class ExpiredTokenException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.EXPIRED_TOKEN.value, error_type=HTTPCodes.FORBIDDEN.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.EXPIRED_TOKEN, http_code=HTTPCodes.FORBIDDEN, details=details)
 
 
-class IncorrectUser(BaseServerException):
+class IncorrectUserException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.INCORRECT_USER.value, error_type=HTTPCodes.UNAUTHORIZED.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.INCORRECT_USER, http_code=HTTPCodes.UNAUTHORIZED, details=details)
 
 
-class JsonFormatInvalid(BaseServerException):
+class JsonFormatInvalidException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.JSON_FORMAT_INVALID.value, error_type=HTTPCodes.BAD_REQUEST.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.JSON_FORMAT_INVALID, http_code=HTTPCodes.BAD_REQUEST, details=details)
 
 
-class JsonNestedFormatInvalid(BaseServerException):
+class JsonNestedFormatInvalidException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.JSON_NESTED_FORMAT_INVALID.value, error_type=HTTPCodes.BAD_REQUEST.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.JSON_NESTED_FORMAT_INVALID, http_code=HTTPCodes.BAD_REQUEST, details=details)
 
 
-class JsonInvalidDataType(BaseServerException):
+class JsonInvalidDataTypeException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.JSON_INVALID_DATA_TYPE.value, error_type=HTTPCodes.BAD_REQUEST.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.JSON_INVALID_DATA_TYPE, http_code=HTTPCodes.BAD_REQUEST, details=details)
 
 
-class JsonMissingParameters(BaseServerException):
+class JsonMissingParametersException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.JSON_MISSING_PARAMETERS.value, error_type=HTTPCodes.BAD_REQUEST.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.JSON_MISSING_PARAMETERS, http_code=HTTPCodes.BAD_REQUEST, details=details)
 
 
-class RouteNotFound(BaseServerException):
+class RouteNotFoundException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.ROUTE_NOT_FOUND.value, error_type=HTTPCodes.NOT_FOUND.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.ROUTE_NOT_FOUND, http_code=HTTPCodes.NOT_FOUND, details=details)
 
 
-class RouteMethodNotAllowed(BaseServerException):
+class RouteMethodNotAllowedException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.ROUTE_METHOD_NOT_ALLOWED.value, error_type=HTTPCodes.METHOD_NOT_ALLOWED.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.ROUTE_METHOD_NOT_ALLOWED, http_code=HTTPCodes.METHOD_NOT_ALLOWED, details=details)
 
 
-class ServerNotWorking(BaseServerException):
+class ServerNotWorkingException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.SERVER_NOT_WORKING.value, error_type=HTTPCodes.INTERNAL_SERVER_ERROR.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.SERVER_NOT_WORKING, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
 
 
-class ServerDBConnectionError(BaseServerException):
+class ServerDBConnectionException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.SERVER_DB_CONNECTION_ERROR.value, error_type=HTTPCodes.INTERNAL_SERVER_ERROR.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.SERVER_DB_CONNECTION_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
 
 
-class ServerUnknownError(BaseServerException):
+class ServerUnknownException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.SERVER_UNKNOWN_ERROR.value, error_type=HTTPCodes.INTERNAL_SERVER_ERROR.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.SERVER_UNKNOWN_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
 
 
-class DataValidationError(BaseServerException):
+class DataValidationException(BaseExceptionError):
     def __init__(self, message, details=None) -> None:
-        super().__init__(message, code=ErrorCodes.ERROR_DATA_VALIDATION.value, error_type=HTTPCodes.BAD_REQUEST.name, details=details)
+        super().__init__(message, error_code=ErrorCodes.ERROR_DATA_VALIDATION, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class SQLModelException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.SQL_MODEL_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class IntegrityException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.SQL_INTEGRITY_ERROR, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class DatabaseConnectionException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.DATABASE_CONNECTION_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class ForeignKeyConstraintViolationException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.FOREIGN_KEY_CONSTRAINT_VIOLATION, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class UniqueConstraintViolationException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.UNIQUE_CONSTRAINT_VIOLATION, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class SQLSyntaxException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.SQL_SYNTAX_ERROR, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class TimeoutException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.TIMEOUT_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class NotSupportedException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.NOT_SUPPORTED_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class TransactionException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.TRANSACTION_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class DataTypeMismatchException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.DATA_TYPE_MISMATCH, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class NoSuchColumnException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.NO_SUCH_COLUMN, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class NoSuchTableException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.NO_SUCH_TABLE, http_code=HTTPCodes.BAD_REQUEST, details=details)
+
+
+class AuthenticationException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.AUTHENTICATION_ERROR, http_code=HTTPCodes.UNAUTHORIZED, details=details)
+
+
+class PermissionException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.PERMISSION_ERROR, http_code=HTTPCodes.FORBIDDEN, details=details)
+
+
+class FilePermissionException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.FILE_PERMISSION_ERROR, http_code=HTTPCodes.FORBIDDEN, details=details)
+
+
+class AttributeException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.ATTRIBUTE_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class TypeException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.TYPE_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class ValueException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.VALUE_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class IndexException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.INDEX_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class KeyException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.KEY_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class ModuleNotFoundException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.MODULE_NOT_FOUND_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class MultipleResultsException(BaseExceptionError):
+    def __init__(self, message="Se encontraron múltiples resultados inesperados", details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.MULTIPLE_RESULTS, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+
+class GenericException(BaseExceptionError):
+    def __init__(self, message="Ocurrió un error inesperado", details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.GENERIC_ERROR, http_code=HTTPCodes.INTERNAL_SERVER_ERROR, details=details)
+
+class NotFoundTokenException(BaseExceptionError):
+    def __init__(self, message, details=None) -> None:
+        super().__init__(message, error_code=ErrorCodes.NOT_FOUND_TOKEN, http_code=HTTPCodes.UNAUTHORIZED, details=details)
+

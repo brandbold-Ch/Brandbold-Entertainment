@@ -6,13 +6,14 @@ from app.services.movie_service import MovieService
 from flask import Blueprint, jsonify, request, Response
 from app.utils.files_tools import (VIDEO_DIR,
                                    RESOURCES_DIR, THUMBNAIL_DIR, res_path)
-
+from flask_jwt_extended import jwt_required
 
 movie_bl = Blueprint("movie", __name__, url_prefix="/movies")
 movie_services = MovieService(Session(engine))
 
 
 @movie_bl.route("/thumbnail/<file>", methods=["GET"])
+@jwt_required()
 def thumbnail(file) -> Response:
     file_path = res_path(RESOURCES_DIR + THUMBNAIL_DIR + file)
 
@@ -27,6 +28,7 @@ def thumbnail(file) -> Response:
 
 
 @movie_bl.route("/stream/<file>", methods=["GET"])
+@jwt_required()
 def stream_video(file) -> Response:
     real_file = res_path(RESOURCES_DIR + VIDEO_DIR + file)
     file_size = path.getsize(real_file)
@@ -66,6 +68,7 @@ def get_chunks(video: str, start: int, end: int, chunk_size=8192) -> AnyStr:
 
 
 @movie_bl.route("/", methods=["GET"])
+@jwt_required()
 def get_movies() -> tuple[Response, int]:
     movies = movie_services.get_movies()
     movies_dict = [

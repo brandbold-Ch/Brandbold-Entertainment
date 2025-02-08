@@ -71,19 +71,22 @@
     .genre-tag:nth-child(5n) { background-color: #9b59b6; } /* Morado */
 
     /* Botones */
-    .btn-action {
+    .btn-action, .btn-watch, button {
         background-color: #e74c3c;
         color: white;
-        padding: 8px 12px;
+        padding: 10px 15px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         font-size: 14px;
-        transition: 0.3s;
+        transition: background-color 0.3s, transform 0.2s;
+        text-decoration: none;
+        display: inline-block;
     }
 
-    .btn-action:hover {
+    .btn-action:hover, .btn-watch:hover, button:hover {
         background-color: #c0392b;
+        transform: scale(1.05);
     }
 
     /* Formulario de actualización */
@@ -139,11 +142,12 @@
         border-radius: 5px;
         cursor: pointer;
         font-size: 14px;
-        transition: 0.3s;
+        transition: background-color 0.3s, transform 0.2s;
     }
 
     .btn-submit:hover {
         background-color: #2980b9;
+        transform: scale(1.05);
     }
 
     .btn-cancel {
@@ -156,27 +160,29 @@
         cursor: pointer;
         font-size: 14px;
         margin-top: 10px;
-        transition: 0.3s;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background-color: #c0392b;
+        transform: scale(1.05);
     }
 
     .movie-thumbnail img {
         max-width: 50px;
         border-radius: 5px;
     }
-
-    .btn-cancel:hover {
-        background-color: #c0392b;
-    }
 </style>
-
 <div class="table-container">
     <table>
         <thead>
             <tr>
+                <th>Image</th>
                 <th>Title</th>
                 <th>Year</th>
                 <th>Genres</th>
                 <th>Description</th>
+                <th>Duration</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -196,12 +202,11 @@
                     </div>
                 </td>
                 <td>{{ movie.description }}</td>
+                <td>{{ movie.duration }}</td>
                 <td>
-                    <button class="btn-action">
-                        <a href="{{ url_for('admin.video_streaming_view', movie_path=movie.video_url) }}" style="color: inherit; text-decoration: none;">Watch</a>
-                    </button>
-                    <button class="btn-action" onclick="showUpdateForm('{{ movie.id }}', '{{ movie.title }}', '{{ movie.release_year }}', '{{ movie.description }}', '{{ movie.duration }}')">Update</button>
-                    <button class="btn-action delete" onclick="deleteMovie('{{ movie.id }}')">Delete</button>
+                    <a href="{{ url_for('admin.video_streaming_view', movie_path=movie.video_url) }}" class="btn-watch">Watch</a>
+                    <button onclick="showUpdateForm('{{ movie.id }}', '{{ movie.title }}', '{{ movie.release_year }}', '{{ movie.description }}', '{{ movie.duration }}')">Update</button>
+                    <button class="delete" onclick="deleteMovie('{{ movie.id }}')">Delete</button>
                 </td>
             </tr>
             {% endfor %}

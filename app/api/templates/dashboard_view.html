@@ -135,7 +135,7 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <img src="../static/images/brand.png" alt="Brand Image" class="header-image">
+        <img src="{{ url_for('static', filename='images/brand.png') }}" alt="Brand Image" class="header-image">
         <h1>Admin Panel</h1>
         <ul>
             <li><a href="/admins/users">Users</a></li>
