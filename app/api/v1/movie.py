@@ -12,12 +12,6 @@ movie_bl = Blueprint("movie", __name__, url_prefix="/movies")
 movie_services = MovieService(Session(engine))
 
 
-def get_chunks(video: str, start: int, end: int) -> AnyStr:
-    with open(video, "rb") as file:
-        file.seek(0)
-        return file.read(end - start + 1)
-
-
 @movie_bl.route("/thumbnail/<file>", methods=["GET"])
 def thumbnail(file) -> Response:
     file_path = res_path(RESOURCES_DIR + THUMBNAIL_DIR + file)
@@ -37,28 +31,38 @@ def stream_video(file) -> Response:
     real_file = res_path(RESOURCES_DIR + VIDEO_DIR + file)
     file_size = path.getsize(real_file)
     range_header = request.headers.get("Range")
+
     if range_header:
-        byte1, byte2 = (range_header
-                        .replace("bytes=", "")
-                        .split("-"))
+        byte1, byte2 = range_header.replace("bytes=", "").split("-")
         start = int(byte1)
-        end = int(byte2) if byte2 else file_size - 1
+        end = int(byte2) if byte2 and byte2.isdigit() else file_size - 1
     else:
         start = 0
         end = file_size - 1
 
-    chunk = get_chunks(real_file, start, end)
     return Response(
-        chunk,
+        get_chunks(real_file, start, end),
         status=206,
         mimetype="video/mp4",
         direct_passthrough=True,
         headers={
             "Content-Range": f"bytes {start}-{end}/{file_size}",
-            "Connection": "keep-live",
-            "Accept-Ranges": "bytes"
+            "Accept-Ranges": "bytes",
+            "Content-Length": str(end - start + 1),
+            "Connection": "keep-alive"
         }
     )
+
+
+def get_chunks(video: str, start: int, end: int, chunk_size=8192) -> AnyStr:
+    with open(video, "rb") as file:
+        file.seek(start)
+        while start < end:
+            data = file.read(min(chunk_size, end - start + 1))
+            if not data:
+                break
+            start += len(data)
+            yield data
 
 
 @movie_bl.route("/", methods=["GET"])

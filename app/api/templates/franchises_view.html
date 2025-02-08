@@ -6,7 +6,7 @@
     <!-- Franchise Creation Form -->
     <div class="section-card">
         <h3>Create New Franchise</h3>
-        <form action="/admin/franchises" method="POST">
+        <form action="/admins/franchises" method="POST">
             <label for="franchise_name" style="color: #eaeaea; font-size: 18px;">Franchise Name:</label><br>
             <input type="text" id="franchise_name" name="name" required placeholder="Enter Franchise Name" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc;"/><br>
 
@@ -38,7 +38,7 @@
                     <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">
                         <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
                             <!-- Edit Button -->
-                            <a href="/admin/franchises/{{ franchise.id }}" style="background-color: #008CBA; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; display: inline-block;">Edit</a>
+                            <a href="/admins/franchises/{{ franchise.id }}" style="background-color: #008CBA; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; display: inline-block;">Edit</a>
 
                             <!-- Delete Button -->
                             <button type="submit" onclick="deleteFranchise('{{ franchise.id }}');" style="background-color: #f05454; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">Delete</button>
