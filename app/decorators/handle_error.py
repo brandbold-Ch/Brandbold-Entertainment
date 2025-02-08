@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError, DBAPIError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError, DBAPIError, NoResultFound, MultipleResultsFound
 from functools import wraps
 from app.exceptions.exceptions import *
 
@@ -11,19 +11,37 @@ def handle_error(func):
 
         except IntegrityError as e:
             self.session.rollback()
-            raise DuplicatedRecord(e.__repr__())
+            raise DuplicatedRecordException(e.__repr__())
 
         except DBAPIError as e:
-            raise ServerDBConnectionError(e.__repr__())
+            raise ServerDBConnectionException(e.__repr__())
+
+        except NoResultFound as e:
+            raise NotFoundException(str(e))
+
+        except MultipleResultsFound as e:
+            raise MultipleResultsFound(e.__repr__())
 
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise ServerUnknownError(e.__repr__())
+            raise ServerUnknownException(e.__repr__())
 
         except FileNotFoundError as e:
-            raise FileNotFound(e.__repr__())
+            raise FileNotFoundException(e.__repr__())
 
         except ValueError as e:
-            raise DataValidationError(e.__repr__())
+            raise DataValidationException(e.__repr__())
+
+        except TypeError as e:
+            raise TypeException(e.__repr__())
+
+        except KeyError as e:
+            raise KeyException(e.__repr__())
+
+        except AttributeError as e:
+            raise AttributeException(e.__repr__())
+
+        except PermissionError as e:
+            raise PermissionException(e.__repr__())
 
     return wrapper

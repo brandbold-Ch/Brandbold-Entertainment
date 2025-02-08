@@ -2,7 +2,7 @@ from app.config.sqlmodel_config import engine
 from app.services.admin_services import AdminService
 from app.services.auth_services import AuthService
 from flask import Blueprint, request, jsonify, Response, render_template
-from app.exceptions.exceptions import DataValidationError
+from app.exceptions.exceptions import DataValidationException
 from sqlmodel import Session
 from app.services import MovieService, GenreService, FranchiseService, UserServices
 from werkzeug.datastructures import FileStorage
@@ -66,10 +66,8 @@ def upload_movie_view() -> str:
     franchises = franchise_service.get_franchises()
     return render_template(
         "upload_movie.html",
-        data={
-            "genres": genres,
-            "franchises": franchises
-        }
+        data={"genres": genres,
+              "franchises": franchises}
     )
 
 
@@ -80,8 +78,7 @@ def users_view(user_id=None) -> str:
         user_service.delete_user(user_id)
 
     elif request.method == "PUT":
-        auth_service.update_status()
-        ...
+        auth_service.update_status(user_id, **request.get_json())
 
     users = user_service.get_users()
     return render_template("users_view.html", data=users)
@@ -117,7 +114,7 @@ def create_admin() -> tuple[Response, int]:
     data = request.get_json()
 
     if "admin" not in data or "auth" not in data:
-        raise DataValidationError("Don't found admin key or auth key")
+        raise DataValidationException("Don't found admin key or auth key")
 
     result = (admin_service
               .create_admin(data["admin"], data["auth"]))

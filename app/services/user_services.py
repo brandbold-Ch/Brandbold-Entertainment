@@ -26,8 +26,8 @@ class UserServices:
         self.session.refresh(user)
         self.session.refresh(auth)
         return {
-            "admin": user.model_dump(mode="json"),
-            "auth": user.model_dump(
+            "user": user.model_dump(mode="json"),
+            "auth": auth.model_dump(
                 mode="json",
                 exclude={"password"}
             )

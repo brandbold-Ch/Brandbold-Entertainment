@@ -1,6 +1,6 @@
 from functools import wraps
 from app.decorators.handle_error import handle_error
-from app.exceptions.exceptions import NotFound
+from app.exceptions.exceptions import NotFoundException
 
 
 @handle_error
@@ -9,11 +9,11 @@ def injectable_entity(model, only_parse=False, index=None):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             if not only_parse:
-                entity_id = args[0] if args else kwargs.get("entity_id")
-                data = self.session.get(model, entity_id) if entity_id else None
+                entity_id = args[0]
+                data = self.session.get(model, entity_id)
 
                 if not data:
-                    raise NotFound(f"{model.__name__} not found with ID {entity_id}")
+                    raise NotFoundException(f"{model.__name__} not found with ID {entity_id}")
 
                 kwargs[model.__name__.lower()] = data
                 return func(self, *args, **kwargs)

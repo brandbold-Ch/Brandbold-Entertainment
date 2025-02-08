@@ -1,5 +1,5 @@
 from sqlalchemy import ScalarResult
-from sqlmodel import Session, select, update
+from sqlmodel import Session, select
 from app.decorators.handle_error import handle_error
 from app.decorators.injectables import injectable_entity
 from app.models import Franchise
