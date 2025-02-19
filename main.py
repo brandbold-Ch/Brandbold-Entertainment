@@ -28,8 +28,8 @@ def invalid_token_cb(error) -> tuple[Response, int]:
 
 
 @jwt.expired_token_loader
-def expired_token_cb(error) -> tuple[Response, int]:
-    exc = ExpiredTokenException(error.__repr__())
+def expired_token_cb(jwt_header, jwt_payload) -> tuple[Response, int]:
+    exc = ExpiredTokenException("Expired Token")
     return jsonify(exc.to_dict()), exc.http_code
 
 
